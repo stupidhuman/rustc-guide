@@ -1,0 +1,626 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Well-formedness checking - Guide to Rustc Development</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A guide to developing rustc">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="affix"><a href="../about-this-guide.html">About this guide</a></li><li class="spacer"></li><li><a href="../part-1-intro.html"><strong aria-hidden="true">1.</strong> Part 1: Building, debugging, and contributing to Rustc</a></li><li><ol class="section"><li><a href="../compiler-team.html"><strong aria-hidden="true">1.1.</strong> About the compiler team</a></li><li><a href="../how-to-build-and-run.html"><strong aria-hidden="true">1.2.</strong> How to Build and Run the Compiler</a></li><li><ol class="section"><li><a href="../build-install-distribution-artifacts.html"><strong aria-hidden="true">1.2.1.</strong> Build and Install distribution artifacts</a></li><li><a href="../compiler-documenting.html"><strong aria-hidden="true">1.2.2.</strong> Documenting Compiler</a></li></ol></li><li><a href="../tests/intro.html"><strong aria-hidden="true">1.3.</strong> The compiler testing framework</a></li><li><ol class="section"><li><a href="../tests/running.html"><strong aria-hidden="true">1.3.1.</strong> Running tests</a></li><li><a href="../tests/adding.html"><strong aria-hidden="true">1.3.2.</strong> Adding new tests</a></li><li><a href="../compiletest.html"><strong aria-hidden="true">1.3.3.</strong> Using compiletest + commands to control test execution</a></li></ol></li><li><a href="../walkthrough.html"><strong aria-hidden="true">1.4.</strong> Walkthrough: a typical contribution</a></li><li><a href="../implementing_new_features.html"><strong aria-hidden="true">1.5.</strong> Implementing new features</a></li><li><a href="../stability.html"><strong aria-hidden="true">1.6.</strong> Stability attributes</a></li><li><a href="../stabilization_guide.html"><strong aria-hidden="true">1.7.</strong> Stabilizing Features</a></li><li><a href="../compiler-debugging.html"><strong aria-hidden="true">1.8.</strong> Debugging the Compiler</a></li><li><a href="../profiling.html"><strong aria-hidden="true">1.9.</strong> Profiling the compiler</a></li><li><ol class="section"><li><a href="../profiling/with_perf.html"><strong aria-hidden="true">1.9.1.</strong> with the linux perf tool</a></li></ol></li><li><a href="../conventions.html"><strong aria-hidden="true">1.10.</strong> Coding conventions</a></li><li><a href="../crates-io.html"><strong aria-hidden="true">1.11.</strong> crates.io Dependencies</a></li><li><a href="../diagnostics.html"><strong aria-hidden="true">1.12.</strong> Emitting Errors and other Diagnostics</a></li><li><a href="../ice-breaker/about.html"><strong aria-hidden="true">1.13.</strong> ICE-breaker teams</a></li><li><ol class="section"><li><a href="../ice-breaker/llvm.html"><strong aria-hidden="true">1.13.1.</strong> LLVM ICE-breakers</a></li></ol></li></ol></li><li><a href="../part-2-intro.html"><strong aria-hidden="true">2.</strong> Part 2: How rustc works</a></li><li><ol class="section"><li><a href="../high-level-overview.html"><strong aria-hidden="true">2.1.</strong> High-level overview of the compiler source</a></li><li><a href="../rustc-driver.html"><strong aria-hidden="true">2.2.</strong> The Rustc Driver and Interface</a></li><li><ol class="section"><li><a href="../rustdoc.html"><strong aria-hidden="true">2.2.1.</strong> Rustdoc</a></li></ol></li><li><a href="../query.html"><strong aria-hidden="true">2.3.</strong> Queries: demand-driven compilation</a></li><li><ol class="section"><li><a href="../queries/query-evaluation-model-in-detail.html"><strong aria-hidden="true">2.3.1.</strong> The Query Evaluation Model in Detail</a></li><li><a href="../queries/incremental-compilation.html"><strong aria-hidden="true">2.3.2.</strong> Incremental compilation</a></li><li><a href="../queries/incremental-compilation-in-detail.html"><strong aria-hidden="true">2.3.3.</strong> Incremental compilation In Detail</a></li><li><a href="../incrcomp-debugging.html"><strong aria-hidden="true">2.3.4.</strong> Debugging and Testing</a></li></ol></li><li><a href="../the-parser.html"><strong aria-hidden="true">2.4.</strong> The parser</a></li><li><a href="../test-implementation.html"><strong aria-hidden="true">2.5.</strong> #[test] Implementation</a></li><li><a href="../macro-expansion.html"><strong aria-hidden="true">2.6.</strong> Macro expansion</a></li><li><a href="../name-resolution.html"><strong aria-hidden="true">2.7.</strong> Name resolution</a></li><li><a href="../hir.html"><strong aria-hidden="true">2.8.</strong> The HIR (High-level IR)</a></li><li><ol class="section"><li><a href="../lowering.html"><strong aria-hidden="true">2.8.1.</strong> Lowering AST to HIR</a></li><li><a href="../hir-debugging.html"><strong aria-hidden="true">2.8.2.</strong> Debugging</a></li></ol></li><li><a href="../closure.html"><strong aria-hidden="true">2.9.</strong> Closure expansion</a></li><li><a href="../ty.html"><strong aria-hidden="true">2.10.</strong> The ty module: representing types</a></li><li><a href="../generic_arguments.html"><strong aria-hidden="true">2.11.</strong> Generic arguments</a></li><li><a href="../type-inference.html"><strong aria-hidden="true">2.12.</strong> Type inference</a></li><li><a href="../traits/resolution.html"><strong aria-hidden="true">2.13.</strong> Trait solving (old-style)</a></li><li><ol class="section"><li><a href="../traits/hrtb.html"><strong aria-hidden="true">2.13.1.</strong> Higher-ranked trait bounds</a></li><li><a href="../traits/caching.html"><strong aria-hidden="true">2.13.2.</strong> Caching subtleties</a></li><li><a href="../traits/specialization.html"><strong aria-hidden="true">2.13.3.</strong> Specialization</a></li></ol></li><li><a href="../traits/index.html"><strong aria-hidden="true">2.14.</strong> Trait solving (new-style)</a></li><li><ol class="section"><li><a href="../traits/lowering-to-logic.html"><strong aria-hidden="true">2.14.1.</strong> Lowering to logic</a></li><li><ol class="section"><li><a href="../traits/goals-and-clauses.html"><strong aria-hidden="true">2.14.1.1.</strong> Goals and clauses</a></li><li><a href="../traits/associated-types.html"><strong aria-hidden="true">2.14.1.2.</strong> Equality and associated types</a></li><li><a href="../traits/implied-bounds.html"><strong aria-hidden="true">2.14.1.3.</strong> Implied bounds</a></li><li><a href="../traits/regions.html"><strong aria-hidden="true">2.14.1.4.</strong> Region constraints</a></li><li><a href="../traits/lowering-module.html"><strong aria-hidden="true">2.14.1.5.</strong> The lowering module in rustc</a></li><li><a href="../traits/lowering-rules.html"><strong aria-hidden="true">2.14.1.6.</strong> Lowering rules</a></li><li><a href="../traits/wf.html" class="active"><strong aria-hidden="true">2.14.1.7.</strong> Well-formedness checking</a></li></ol></li><li><a href="../traits/canonical-queries.html"><strong aria-hidden="true">2.14.2.</strong> Canonical queries</a></li><li><ol class="section"><li><a href="../traits/canonicalization.html"><strong aria-hidden="true">2.14.2.1.</strong> Canonicalization</a></li></ol></li><li><a href="../traits/slg.html"><strong aria-hidden="true">2.14.3.</strong> The SLG solver</a></li><li><a href="../traits/chalk-overview.html"><strong aria-hidden="true">2.14.4.</strong> An Overview of Chalk</a></li><li><a href="../traits/bibliography.html"><strong aria-hidden="true">2.14.5.</strong> Bibliography</a></li></ol></li><li><a href="../type-checking.html"><strong aria-hidden="true">2.15.</strong> Type checking</a></li><li><ol class="section"><li><a href="../method-lookup.html"><strong aria-hidden="true">2.15.1.</strong> Method Lookup</a></li><li><a href="../variance.html"><strong aria-hidden="true">2.15.2.</strong> Variance</a></li><li><a href="../opaque-types-type-alias-impl-trait.html"><strong aria-hidden="true">2.15.3.</strong> Opaque Types</a></li></ol></li><li><a href="../mir/index.html"><strong aria-hidden="true">2.16.</strong> The MIR (Mid-level IR)</a></li><li><ol class="section"><li><a href="../mir/construction.html"><strong aria-hidden="true">2.16.1.</strong> MIR construction</a></li><li><a href="../mir/visitor.html"><strong aria-hidden="true">2.16.2.</strong> MIR visitor and traversal</a></li><li><a href="../mir/passes.html"><strong aria-hidden="true">2.16.3.</strong> MIR passes: getting the MIR for a function</a></li><li><a href="../mir/optimizations.html"><strong aria-hidden="true">2.16.4.</strong> MIR optimizations</a></li><li><a href="../mir/debugging.html"><strong aria-hidden="true">2.16.5.</strong> Debugging</a></li></ol></li><li><a href="../borrow_check.html"><strong aria-hidden="true">2.17.</strong> The borrow checker</a></li><li><ol class="section"><li><a href="../borrow_check/moves_and_initialization.html"><strong aria-hidden="true">2.17.1.</strong> Tracking moves and initialization</a></li><li><ol class="section"><li><a href="../borrow_check/moves_and_initialization/move_paths.html"><strong aria-hidden="true">2.17.1.1.</strong> Move paths</a></li></ol></li><li><a href="../borrow_check/type_check.html"><strong aria-hidden="true">2.17.2.</strong> MIR type checker</a></li><li><a href="../borrow_check/region_inference.html"><strong aria-hidden="true">2.17.3.</strong> Region inference</a></li><li><ol class="section"><li><a href="../borrow_check/region_inference/constraint_propagation.html"><strong aria-hidden="true">2.17.3.1.</strong> Constraint propagation</a></li><li><a href="../borrow_check/region_inference/lifetime_parameters.html"><strong aria-hidden="true">2.17.3.2.</strong> Lifetime parameters</a></li><li><a href="../borrow_check/region_inference/member_constraints.html"><strong aria-hidden="true">2.17.3.3.</strong> Member constraints</a></li><li><a href="../borrow_check/region_inference/placeholders_and_universes.html"><strong aria-hidden="true">2.17.3.4.</strong> Placeholders and universes</a></li><li><a href="../borrow_check/region_inference/closure_constraints.html"><strong aria-hidden="true">2.17.3.5.</strong> Closure constraints</a></li><li><a href="../borrow_check/region_inference/error_reporting.html"><strong aria-hidden="true">2.17.3.6.</strong> Error reporting</a></li></ol></li><li><a href="../borrow_check/two_phase_borrows.html"><strong aria-hidden="true">2.17.4.</strong> Two-phase-borrows</a></li></ol></li><li><a href="../const-eval.html"><strong aria-hidden="true">2.18.</strong> Constant evaluation</a></li><li><ol class="section"><li><a href="../miri.html"><strong aria-hidden="true">2.18.1.</strong> miri const evaluator</a></li></ol></li><li><a href="../param_env.html"><strong aria-hidden="true">2.19.</strong> Parameter Environments</a></li><li><a href="../codegen.html"><strong aria-hidden="true">2.20.</strong> Code Generation</a></li><li><ol class="section"><li><a href="../codegen/updating-llvm.html"><strong aria-hidden="true">2.20.1.</strong> Updating LLVM</a></li><li><a href="../codegen/debugging.html"><strong aria-hidden="true">2.20.2.</strong> Debugging LLVM</a></li></ol></li><li><a href="../profile-guided-optimization.html"><strong aria-hidden="true">2.21.</strong> Profile-guided Optimization</a></li><li><a href="../debugging-support-in-rustc.html"><strong aria-hidden="true">2.22.</strong> Debugging Support in Rust Compiler</a></li><li class="spacer"></li></ol></li><li><a href="../appendix/stupid-stats.html">Appendix A: Stupid Stats</a></li><li class="affix"><a href="../appendix/background.html">Appendix B: Background material</a></li><li class="affix"><a href="../appendix/glossary.html">Appendix C: Glossary</a></li><li class="affix"><a href="../appendix/code-index.html">Appendix D: Code Index</a></li><li class="affix"><a href="../appendix/bibliography.html">Appendix E: Bibliography</a></li><li class="affix"><a href="../appendix/humorust.html">Appendix Z: HumorRust</a></li><li class="spacer"></li><li class="affix"><a href="../important-links.html"></a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Guide to Rustc Development</h1>
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#well-formedness-checking" id="well-formedness-checking">Well-formedness checking</a></h1>
+<p>WF checking has the job of checking that the various declarations in a Rust
+program are well-formed. This is the basis for implied bounds, and partly for
+that reason, this checking can be surprisingly subtle! For example, we
+have to be sure that each impl proves the WF conditions declared on
+the trait.</p>
+<p>For each declaration in a Rust program, we will generate a logical goal and try
+to prove it using the lowered rules we described in the
+<a href="./lowering-rules.html">lowering rules</a> chapter. If we are able to prove it, we
+say that the construct is well-formed. If not, we report an error to the user.</p>
+<p>Well-formedness checking happens in the <a href="https://github.com/rust-lang/chalk/blob/master/chalk-solve/src/wf.rs"><code>chalk/chalk-solve/src/wf.rs</code></a>
+module in chalk. After you have read this chapter, you may find useful to see
+an extended set of examples in the <a href="https://github.com/rust-lang/chalk/blob/master/src/test/wf_lowering.rs"><code>chalk/src/test/wf.rs</code></a> submodule.</p>
+<p>The new-style WF checking has not been implemented in rustc yet.</p>
+<p>We give here a complete reference of the generated goals for each Rust
+declaration.</p>
+<p>In addition to the notations introduced in the chapter about
+lowering rules, we'll introduce another notation: when checking WF of a
+declaration, we'll often have to prove that all types that appear are
+well-formed, except type parameters that we always assume to be WF. Hence,
+we'll use the following notation: for a type <code>SomeType&lt;...&gt;</code>, we define
+<code>InputTypes(SomeType&lt;...&gt;)</code> to be the set of all non-parameter types appearing
+in <code>SomeType&lt;...&gt;</code>, including <code>SomeType&lt;...&gt;</code> itself.</p>
+<p>Examples:</p>
+<ul>
+<li><code>InputTypes((u32, f32)) = [u32, f32, (u32, f32)]</code></li>
+<li><code>InputTypes(Box&lt;T&gt;) = [Box&lt;T&gt;]</code> (assuming that <code>T</code> is a type parameter)</li>
+<li><code>InputTypes(Box&lt;Box&lt;T&gt;&gt;) = [Box&lt;T&gt;, Box&lt;Box&lt;T&gt;&gt;]</code></li>
+</ul>
+<p>We also extend the <code>InputTypes</code> notation to where clauses in the natural way.
+So, for example <code>InputTypes(A0: Trait&lt;A1,...,An&gt;)</code> is the union of
+<code>InputTypes(A0)</code>, <code>InputTypes(A1)</code>, ..., <code>InputTypes(An)</code>.</p>
+<h1><a class="header" href="#type-definitions" id="type-definitions">Type definitions</a></h1>
+<p>Given a general type definition:</p>
+<pre><code class="language-rust ignore">struct Type&lt;P...&gt; where WC_type {
+    field1: A1,
+    ...
+    fieldn: An,
+}
+</code></pre>
+<p>we generate the following goal, which represents its well-formedness condition:</p>
+<pre><code class="language-text">forall&lt;P...&gt; {
+    if (FromEnv(WC_type)) {
+        WellFormed(InputTypes(WC_type)) &amp;&amp;
+            WellFormed(InputTypes(A1)) &amp;&amp;
+            ...
+            WellFormed(InputTypes(An))
+    }
+}
+</code></pre>
+<p>which in English states: assuming that the where clauses defined on the type
+hold, prove that every type appearing in the type definition is well-formed.</p>
+<p>Some examples:</p>
+<pre><code class="language-rust ignore">struct OnlyClone&lt;T&gt; where T: Clone {
+    clonable: T,
+}
+// The only types appearing are type parameters: we have nothing to check,
+// the type definition is well-formed.
+</code></pre>
+<pre><code class="language-rust ignore">struct Foo&lt;T&gt; where T: Clone {
+    foo: OnlyClone&lt;T&gt;,
+}
+// The only non-parameter type which appears in this definition is
+// `OnlyClone&lt;T&gt;`. The generated goal is the following:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(T: Clone)) {
+//          WellFormed(OnlyClone&lt;T&gt;)
+//     }
+// }
+// ```
+// which is provable.
+</code></pre>
+<pre><code class="language-rust ignore">struct Bar&lt;T&gt; where &lt;T as Iterator&gt;::Item: Debug {
+    bar: i32,
+}
+// The only non-parameter types which appear in this definition are
+// `&lt;T as Iterator&gt;::Item` and `i32`. The generated goal is the following:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(&lt;T as Iterator&gt;::Item: Debug)) {
+//          WellFormed(&lt;T as Iterator&gt;::Item) &amp;&amp;
+//               WellFormed(i32)
+//     }
+// }
+// ```
+// which is not provable since `WellFormed(&lt;T as Iterator&gt;::Item)` requires
+// proving `Implemented(T: Iterator)`, and we are unable to prove that for an
+// unknown `T`.
+//
+// Hence, this type definition is considered illegal. An additional
+// `where T: Iterator` would make it legal.
+</code></pre>
+<h1><a class="header" href="#trait-definitions" id="trait-definitions">Trait definitions</a></h1>
+<p>Given a general trait definition:</p>
+<pre><code class="language-rust ignore">trait Trait&lt;P1...&gt; where WC_trait {
+    type Assoc&lt;P2...&gt;: Bounds_assoc where WC_assoc;
+}
+</code></pre>
+<p>we generate the following goal:</p>
+<pre><code class="language-text">forall&lt;P1...&gt; {
+    if (FromEnv(WC_trait)) {
+        WellFormed(InputTypes(WC_trait)) &amp;&amp;
+
+            forall&lt;P2...&gt; {
+                if (FromEnv(WC_assoc)) {
+                    WellFormed(InputTypes(Bounds_assoc)) &amp;&amp;
+                        WellFormed(InputTypes(WC_assoc))
+                }
+            }
+    }
+}
+</code></pre>
+<p>There is not much to verify in a trait definition. We just want
+to prove that the types appearing in the trait definition are well-formed,
+under the assumption that the different where clauses hold.</p>
+<p>Some examples:</p>
+<pre><code class="language-rust ignore">trait Foo&lt;T&gt; where T: Iterator, &lt;T as Iterator&gt;::Item: Debug {
+    ...
+}
+// The only non-parameter type which appears in this definition is
+// `&lt;T as Iterator&gt;::Item`. The generated goal is the following:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(T: Iterator), FromEnv(&lt;T as Iterator&gt;::Item: Debug)) {
+//         WellFormed(&lt;T as Iterator&gt;::Item)
+//     }
+// }
+// ```
+// which is provable thanks to the `FromEnv(T: Iterator)` assumption.
+</code></pre>
+<pre><code class="language-rust ignore">trait Bar {
+    type Assoc&lt;T&gt;: From&lt;&lt;T as Iterator&gt;::Item&gt;;
+}
+// The only non-parameter type which appears in this definition is
+// `&lt;T as Iterator&gt;::Item`. The generated goal is the following:
+// ```
+// forall&lt;T&gt; {
+//     WellFormed(&lt;T as Iterator&gt;::Item)
+// }
+// ```
+// which is not provable, hence the trait definition is considered illegal.
+</code></pre>
+<pre><code class="language-rust ignore">trait Baz {
+    type Assoc&lt;T&gt;: From&lt;&lt;T as Iterator&gt;::Item&gt; where T: Iterator;
+}
+// The generated goal is now:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(T: Iterator)) {
+//         WellFormed(&lt;T as Iterator&gt;::Item)
+//     }
+// }
+// ```
+// which is now provable.
+</code></pre>
+<h1><a class="header" href="#impls" id="impls">Impls</a></h1>
+<p>Now we give ourselves a general impl for the trait defined above:</p>
+<pre><code class="language-rust ignore">impl&lt;P1...&gt; Trait&lt;A1...&gt; for SomeType&lt;A2...&gt; where WC_impl {
+    type Assoc&lt;P2...&gt; = SomeValue&lt;A3...&gt; where WC_assoc;
+}
+</code></pre>
+<p>Note that here, <code>WC_assoc</code> are the same where clauses as those defined on the
+associated type definition in the trait declaration, <em>except</em> that type
+parameters from the trait are substituted with values provided by the impl
+(see example below). You cannot add new where clauses. You may omit to write
+the where clauses if you want to emphasize the fact that you are actually not
+relying on them.</p>
+<p>Some examples to illustrate that:</p>
+<pre><code class="language-rust ignore">trait Foo&lt;T&gt; {
+    type Assoc where T: Clone;
+}
+
+struct OnlyClone&lt;T: Clone&gt; { ... }
+
+impl&lt;U&gt; Foo&lt;Option&lt;U&gt;&gt; for () {
+    // We substitute type parameters from the trait by the ones provided
+    // by the impl, that is instead of having a `T: Clone` where clause,
+    // we have an `Option&lt;U&gt;: Clone` one.
+    type Assoc = OnlyClone&lt;Option&lt;U&gt;&gt; where Option&lt;U&gt;: Clone;
+}
+
+impl&lt;T&gt; Foo&lt;T&gt; for i32 {
+    // I'm not using the `T: Clone` where clause from the trait, so I can
+    // omit it.
+    type Assoc = u32;
+}
+
+impl&lt;T&gt; Foo&lt;T&gt; for f32 {
+    type Assoc = OnlyClone&lt;Option&lt;T&gt;&gt; where Option&lt;T&gt;: Clone;
+    //                                ^^^^^^^^^^^^^^^^^^^^^^
+    //                                this where clause does not exist
+    //                                on the original trait decl: illegal
+}
+</code></pre>
+<blockquote>
+<p>So in Rust, where clauses on associated types work <em>exactly</em> like where
+clauses on trait methods: in an impl, we must substitute the parameters from
+the traits with values provided by the impl, we may omit them if we don't
+need them, but we cannot add new where clauses.</p>
+</blockquote>
+<p>Now let's see the generated goal for this general impl:</p>
+<pre><code class="language-text">forall&lt;P1...&gt; {
+    // Well-formedness of types appearing in the impl
+    if (FromEnv(WC_impl), FromEnv(InputTypes(SomeType&lt;A2...&gt;: Trait&lt;A1...&gt;))) {
+        WellFormed(InputTypes(WC_impl)) &amp;&amp;
+
+            forall&lt;P2...&gt; {
+                if (FromEnv(WC_assoc)) {
+                        WellFormed(InputTypes(SomeValue&lt;A3...&gt;))
+                }
+            }
+    }
+
+    // Implied bounds checking
+    if (FromEnv(WC_impl), FromEnv(InputTypes(SomeType&lt;A2...&gt;: Trait&lt;A1...&gt;))) {
+        WellFormed(SomeType&lt;A2...&gt;: Trait&lt;A1...&gt;) &amp;&amp;
+
+            forall&lt;P2...&gt; {
+                if (FromEnv(WC_assoc)) {
+                    WellFormed(SomeValue&lt;A3...&gt;: Bounds_assoc)
+                }
+            }
+    }
+}
+</code></pre>
+<p>Here is the most complex goal. As always, first, assuming that
+the various where clauses hold, we prove that every type appearing in the impl
+is well-formed, <em><strong>except</strong></em> types appearing in the impl header
+<code>SomeType&lt;A2...&gt;: Trait&lt;A1...&gt;</code>. Instead, we <em>assume</em> that those types are
+well-formed
+(hence the <code>if (FromEnv(InputTypes(SomeType&lt;A2...&gt;: Trait&lt;A1...&gt;)))</code>
+conditions). This is
+part of the implied bounds proposal, so that we can rely on the bounds
+written on the definition of e.g. the <code>SomeType&lt;A2...&gt;</code> type (and that we don't
+need to repeat those bounds).</p>
+<blockquote>
+<p>Note that we don't need to check well-formedness of types appearing in
+<code>WC_assoc</code> because we already did that in the trait decl (they are just
+repeated with some substitutions of values which we already assume to be
+well-formed)</p>
+</blockquote>
+<p>Next, still assuming that the where clauses on the impl <code>WC_impl</code> hold and that
+the input types of <code>SomeType&lt;A2...&gt;</code> are well-formed, we prove that
+<code>WellFormed(SomeType&lt;A2...&gt;: Trait&lt;A1...&gt;)</code> hold. That is, we want to prove
+that <code>SomeType&lt;A2...&gt;</code> verify all the where clauses that might transitively
+be required by the <code>Trait</code> definition (see
+<a href="./implied-bounds.html#co-inductiveness-of-wellformed">this subsection</a>).</p>
+<p>Lastly, assuming in addition that the where clauses on the associated type
+<code>WC_assoc</code> hold,
+we prove that <code>WellFormed(SomeValue&lt;A3...&gt;: Bounds_assoc)</code> hold. Again, we are
+not only proving <code>Implemented(SomeValue&lt;A3...&gt;: Bounds_assoc)</code>, but also
+all the facts that might transitively come from <code>Bounds_assoc</code>. We must do this
+because we allow the use of implied bounds on associated types: if we have
+<code>FromEnv(SomeType: Trait)</code> in our environment, the lowering rules
+chapter indicates that we are able to deduce
+<code>FromEnv(&lt;SomeType as Trait&gt;::Assoc: Bounds_assoc)</code> without knowing what the
+precise value of <code>&lt;SomeType as Trait&gt;::Assoc</code> is.</p>
+<p>Some examples for the generated goal:</p>
+<pre><code class="language-rust ignore">// Trait Program Clauses
+
+// These are program clauses that come from the trait definitions below
+// and that the trait solver can use for its reasonings. I'm just restating
+// them here so that we have them in mind.
+
+trait Copy { }
+// This is a program clause that comes from the trait definition above
+// and that the trait solver can use for its reasonings. I'm just restating
+// it here (and also the few other ones coming just after) so that we have
+// them in mind.
+// `WellFormed(Self: Copy) :- Implemented(Self: Copy).`
+
+trait Partial where Self: Copy { }
+// ```
+// WellFormed(Self: Partial) :-
+//     Implemented(Self: Partial) &amp;&amp;
+//     WellFormed(Self: Copy).
+// ```
+
+trait Complete where Self: Partial { }
+// ```
+// WellFormed(Self: Complete) :-
+//     Implemented(Self: Complete) &amp;&amp;
+//     WellFormed(Self: Partial).
+// ```
+
+// Impl WF Goals
+
+impl&lt;T&gt; Partial for T where T: Complete { }
+// The generated goal is:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(T: Complete)) {
+//         WellFormed(T: Partial)
+//     }
+// }
+// ```
+// Then proving `WellFormed(T: Partial)` amounts to proving
+// `Implemented(T: Partial)` and `Implemented(T: Copy)`.
+// Both those facts can be deduced from the `FromEnv(T: Complete)` in our
+// environment: this impl is legal.
+
+impl&lt;T&gt; Complete for T { }
+// The generated goal is:
+// ```
+// forall&lt;T&gt; {
+//     WellFormed(T: Complete)
+// }
+// ```
+// Then proving `WellFormed(T: Complete)` amounts to proving
+// `Implemented(T: Complete)`, `Implemented(T: Partial)` and
+// `Implemented(T: Copy)`.
+//
+// `Implemented(T: Complete)` can be proved thanks to the
+// `impl&lt;T&gt; Complete for T` blanket impl.
+//
+// `Implemented(T: Partial)` can be proved thanks to the
+// `impl&lt;T&gt; Partial for T where T: Complete` impl and because we know
+// `T: Complete` holds.
+
+// However, `Implemented(T: Copy)` cannot be proved: the impl is illegal.
+// An additional `where T: Copy` bound would be sufficient to make that impl
+// legal.
+</code></pre>
+<pre><code class="language-rust ignore">trait Bar { }
+
+impl&lt;T&gt; Bar for T where &lt;T as Iterator&gt;::Item: Bar { }
+// We have a non-parameter type appearing in the where clauses:
+// `&lt;T as Iterator&gt;::Item`. The generated goal is:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(&lt;T as Iterator&gt;::Item: Bar)) {
+//         WellFormed(T: Bar) &amp;&amp;
+//             WellFormed(&lt;T as Iterator&gt;::Item: Bar)
+//     }
+// }
+// ```
+// And `WellFormed(&lt;T as Iterator&gt;::Item: Bar)` is not provable: we'd need
+// an additional `where T: Iterator` for example.
+</code></pre>
+<pre><code class="language-rust ignore">trait Foo { }
+
+trait Bar {
+    type Item: Foo;
+}
+
+struct Stuff&lt;T&gt; { }
+
+impl&lt;T&gt; Bar for Stuff&lt;T&gt; where T: Foo {
+    type Item = T;
+}
+// The generated goal is:
+// ```
+// forall&lt;T&gt; {
+//     if (FromEnv(T: Foo)) {
+//         WellFormed(T: Foo).
+//     }
+// }
+// ```
+// which is provable.
+</code></pre>
+<pre><code class="language-rust ignore">trait Debug { ... }
+// `WellFormed(Self: Debug) :- Implemented(Self: Debug).`
+
+struct Box&lt;T&gt; { ... }
+impl&lt;T&gt; Debug for Box&lt;T&gt; where T: Debug { ... }
+
+trait PointerFamily {
+    type Pointer&lt;T&gt;: Debug where T: Debug;
+}
+// `WellFormed(Self: PointerFamily) :- Implemented(Self: PointerFamily).`
+
+struct BoxFamily;
+
+impl PointerFamily for BoxFamily {
+    type Pointer&lt;T&gt; = Box&lt;T&gt; where T: Debug;
+}
+// The generated goal is:
+// ```
+// forall&lt;T&gt; {
+//     WellFormed(BoxFamily: PointerFamily) &amp;&amp;
+//
+//     if (FromEnv(T: Debug)) {
+//         WellFormed(Box&lt;T&gt;: Debug) &amp;&amp;
+//             WellFormed(Box&lt;T&gt;)
+//     }
+// }
+// ```
+// `WellFormed(BoxFamily: PointerFamily)` amounts to proving
+// `Implemented(BoxFamily: PointerFamily)`, which is ok thanks to our impl.
+//
+// `WellFormed(Box&lt;T&gt;)` is always true (there are no where clauses on the
+// `Box` type definition).
+//
+// Moreover, we have an `impl&lt;T: Debug&gt; Debug for Box&lt;T&gt;`, hence
+// we can prove `WellFormed(Box&lt;T&gt;: Debug)` and the impl is indeed legal.
+</code></pre>
+<pre><code class="language-rust ignore">trait Foo {
+    type Assoc&lt;T&gt;;
+}
+
+struct OnlyClone&lt;T: Clone&gt; { ... }
+
+impl Foo for i32 {
+    type Assoc&lt;T&gt; = OnlyClone&lt;T&gt;;
+}
+// The generated goal is:
+// ```
+// forall&lt;T&gt; {
+//     WellFormed(i32: Foo) &amp;&amp;
+//        WellFormed(OnlyClone&lt;T&gt;)
+// }
+// ```
+// however `WellFormed(OnlyClone&lt;T&gt;)` is not provable because it requires
+// `Implemented(T: Clone)`. It would be tempting to just add a `where T: Clone`
+// bound inside the `impl Foo for i32` block, however we saw that it was
+// illegal to add where clauses that didn't come from the trait definition.
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../traits/lowering-rules.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../traits/canonical-queries.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../traits/lowering-rules.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../traits/canonical-queries.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
